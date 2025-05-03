@@ -57,25 +57,35 @@ class DialogueAgent(BaseAgent):
         """
         Perform a single fine-tuning step using input-output pairs.
 
-        :param observations: List of input strings (e.g., questions or prompts).
-        :param actions: List of expected outputs (e.g., correct responses).
+        :param observations: List of input strings (prompts).
+        :param actions: List of expected output strings (responses).
+        :return: Training loss value.
         """
         if not (isinstance(observations, list) and isinstance(actions, list) and len(observations) == len(actions)):
             raise ValueError("Both observations and actions must be lists of equal length.")
 
         self.model.train()
 
-        # Prepare tokenized inputs and labels
-        inputs = self.tokenizer(observations, return_tensors="pt", padding=True, truncation=True).to(self.device)
-        labels = self.tokenizer(actions, return_tensors="pt", padding=True, truncation=True).input_ids.to(self.device)
+        full_texts = [obs + self.tokenizer.eos_token + act for obs, act in zip(observations, actions)]
 
-        # Replace padding token id with -100 so they're ignored in the loss
-        labels[labels == self.tokenizer.pad_token_id] = -100
+        encodings = self.tokenizer(
+            full_texts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            return_attention_mask=True
+        ).to(self.device)
 
-        outputs = self.model(**inputs, labels=labels)
+        input_ids = encodings["input_ids"]
+        attention_mask = encodings["attention_mask"]
+
+        # Удаляем потери по токенам padding
+        labels = input_ids.clone()
+        labels[input_ids == self.tokenizer.pad_token_id] = -100  # <- игнорируем паддинг
+
+        outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs.loss
 
-        # Backpropagation
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()

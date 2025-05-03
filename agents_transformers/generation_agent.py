@@ -1,8 +1,7 @@
 from typing import Any
 from transformers import PreTrainedModel, PreTrainedTokenizer, AutoTokenizer
-from torch.nn import functional as F
 import torch
-from base_agent import BaseAgent
+from agents_transformers.base_agent import BaseAgent
 
 
 class TextGenerationAgent(BaseAgent):

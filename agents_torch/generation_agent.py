@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from transformers import PreTrainedTokenizer, AutoTokenizer, AutoModelForCausalLM
-from base_agent import BaseAgent  # Абстрактный базовый агент
+from agents_torch.base_agent import BaseAgent
 
 
 class TextGenerationAgent(BaseAgent):
