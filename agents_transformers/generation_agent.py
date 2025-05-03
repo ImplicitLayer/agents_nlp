@@ -64,7 +64,6 @@ class TextGenerationAgent(BaseAgent):
 
         losses = []
         for prompt, expected in zip(observations, actions):
-            # Объединяем prompt и target для обучения автопорождения
             input_text = prompt + self.tokenizer.eos_token + expected
             encodings = self.tokenizer(input_text, return_tensors="pt", truncation=True, padding=True).to(self.device)
             labels = encodings["input_ids"].clone()

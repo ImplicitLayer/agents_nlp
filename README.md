@@ -6,7 +6,7 @@ the 🤗 `transformers` library and custom models in pure `PyTorch`.
 
 Tasks solved by agents:
 
-* Sentiment Analysis (Sentiment Analysis)
+* Sentiment Analysis
 
 * Dialogue Generation
 

@@ -46,25 +46,20 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from agents_transformers.dialogue_agent import DialogueAgent
 
 
-# 1. Загрузка модели и токенизатора
 model_name = "EleutherAI/gpt-neo-125M"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
-# 2. Установка pad_token, так как GPT-Neo его не имеет
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
     model.config.pad_token_id = tokenizer.pad_token_id
 
-# 3. Создание агента
 agent = DialogueAgent(model=model, tokenizer=tokenizer, max_length=50)
 
-# 4. Пример генерации
 prompt = "What is the capital of France?"
 response = agent.act(prompt)
 print("Generated:", response)
 
-# 5. Пример обучения
 observations = ["What is the capital of France?", "Who wrote 1984?"]
 actions = ["Paris is the capital of France.", "George Orwell wrote 1984."]
 loss = agent.train_step(observations, actions)
